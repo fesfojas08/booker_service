@@ -3,8 +3,10 @@ package pw.io.booker.controller;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,12 +49,13 @@ public class AuthenticationController {
 		loginAuth.setUser(customer.get());
 		loginAuth.setLoginDate(LocalDate.now());
 		loginAuth.setToken(token);
-		authenticationRepository.save(authentication);
+		authenticationRepository.save(loginAuth);
 		return token;
 	}
 	
-	@PostMapping("logout")
-	public void logout(@RequestParam("token") String token) {
+	@GetMapping("logout")
+	public void logout(@RequestParam("token") String token, 
+			@RequestHeader("Authentication-Token") String session) {
 		Authentication currentAuth = authenticationRepository.findByToken(token).get();
 		authenticationRepository.delete(currentAuth);
 	}

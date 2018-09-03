@@ -1,7 +1,6 @@
 package pw.io.booker.model;
 
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,15 +17,18 @@ public class Customer {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="customer_id")
 	private int customerId;
+	
 	private String firstName;
 	private String lastName;
+	
 	@Column(unique=true, nullable=false)
 	private String username;
+	
 	@Column(nullable=false)
 	private String password;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "customer", cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "customer")
 	private List<Reservation> reservation;
 
 	public int getCustomerId() {
