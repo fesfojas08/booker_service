@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import pw.io.booker.exception.BookerServiceException;
 import pw.io.booker.model.Authentication;
 import pw.io.booker.model.Customer;
 import pw.io.booker.repo.AuthenticationRepository;
@@ -33,13 +34,13 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/login")
-	public String login(@RequestBody Authentication authentication) {
+	public String login(@RequestBody Authentication authentication) throws BookerServiceException {
 		String token = "";
 		Optional<Customer> customer = customerRepository.findByUsernameAndPassword(
 				authentication.getUser().getUsername(), 
 				authentication.getUser().getPassword());
 		if(!customer.isPresent()) {
-			throw new RuntimeException("Invalid Credentials!");
+			throw new BookerServiceException("Invalid Credentials!");
 		}
 		
 		authenticationRepository.deleteAll(authenticationRepository.findByUser(customer.get()));

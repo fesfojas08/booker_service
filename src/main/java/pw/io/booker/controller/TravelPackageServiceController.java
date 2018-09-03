@@ -1,6 +1,7 @@
 package pw.io.booker.controller;
 
 import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import pw.io.booker.exception.BookerServiceException;
 import pw.io.booker.model.Service;
 import pw.io.booker.model.TravelPackage;
 import pw.io.booker.repo.ServiceRepository;
@@ -42,7 +45,7 @@ public class TravelPackageServiceController {
       @RequestBody List<Service> services, @RequestHeader("Authentication-Token") String token) {
     for(Service service : services) {
       if(serviceRepository.findById(service.getServiceId()).isPresent()) {
-        throw new RuntimeException("Services already exist");
+        throw new BookerServiceException("Services already exist");
       }
     }
     TravelPackage travelPackage = travelPackageRepository.findById(travelPackageId).get();
@@ -55,7 +58,7 @@ public class TravelPackageServiceController {
       @RequestBody List<Service> services, @RequestHeader("Authentication-Token") String token) {
     for (Service service: services) {
       if (!serviceRepository.findById(service.getServiceId()).isPresent()) {
-        throw new RuntimeException("Service should exist first");
+        throw new BookerServiceException("Service should exist first");
       }
     }
     return (List<Service>) serviceRepository.saveAll(services);
@@ -81,10 +84,10 @@ public class TravelPackageServiceController {
       @PathVariable("serviceId") int serviceId, @RequestBody Service service,
       @RequestHeader("Authentication-Token") String token) {
     if(serviceId != service.getServiceId()) {
-      throw new RuntimeException("Id is not the same with the object id");
+      throw new BookerServiceException("Id is not the same with the object id");
     }
     if (!serviceRepository.findById(service.getServiceId()).isPresent()) {
-      throw new RuntimeException("Service should exist first");
+      throw new BookerServiceException("Service should exist first");
     }
     service.setServiceId(serviceId);
     return serviceRepository.save(service);

@@ -1,6 +1,7 @@
 package pw.io.booker.controller;
 
 import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import pw.io.booker.exception.BookerServiceException;
 import pw.io.booker.model.TravelPackage;
 import pw.io.booker.repo.TravelPackageRepository;
 
@@ -43,7 +46,7 @@ public class TravelPackageController {
 		  @RequestHeader("Authentication-Token") String token) {
     for (TravelPackage travelPackage : travelPackages) {
       if (!travelPackageRepository.findById(travelPackage.getTravelPackageId()).isPresent()) {
-        throw new RuntimeException("Travel Package should exist first");
+        throw new BookerServiceException("Travel Package should exist first");
       }
     }
     return (List<TravelPackage>) travelPackageRepository.saveAll(travelPackages);
@@ -69,10 +72,10 @@ public class TravelPackageController {
   public TravelPackage updateTravelPackage(@PathVariable("travelPackageId") int travelPackageId,
       @RequestBody TravelPackage travelPackage, @RequestHeader("Authentication-Token") String token) {
     if(travelPackageId != travelPackage.getTravelPackageId()) {
-      throw new RuntimeException("Id is not the same with the object id");
+      throw new BookerServiceException("Id is not the same with the object id");
     }
     if (!travelPackageRepository.findById(travelPackage.getTravelPackageId()).isPresent()) {
-      throw new RuntimeException("Travel Package should exist first");
+      throw new BookerServiceException("Travel Package should exist first");
     }
     travelPackage.setTravelPackageId(travelPackageId);
     return travelPackageRepository.save(travelPackage);

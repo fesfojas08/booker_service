@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import pw.io.booker.exception.BookerServiceException;
 import pw.io.booker.model.Image;
 import pw.io.booker.model.Reservation;
 import pw.io.booker.model.Service;
@@ -54,22 +56,22 @@ public class ReservationController {
 		  @RequestHeader("Authentication-Token") String token) {
     for (Reservation reservation : reservations) {
       if (reservationRepository.findById(reservation.getReservationId()).isPresent()) {
-        throw new RuntimeException("Reservations already exist");
+        throw new BookerServiceException("Reservations already exist");
       }
       for (Service service : reservation.getAvailedServiceList()) {
         if (!serviceRepository.findById(service.getServiceId()).isPresent()) {
-          throw new RuntimeException("Service doesn't exist");
+          throw new BookerServiceException("Service doesn't exist");
         }
 
         for (Image image : service.getImages()) {
           if (!imageRepository.findById(image.getImageId()).isPresent()) {
-            throw new RuntimeException("Image doesn't exist");
+            throw new BookerServiceException("Image doesn't exist");
           }
         }
 
 
         if (!customerRepository.findById(reservation.getCustomer().getCustomerId()).isPresent()) {
-          throw new RuntimeException("Customer doesn't exist");
+          throw new BookerServiceException("Customer doesn't exist");
         }
       }
     }
@@ -81,22 +83,22 @@ public class ReservationController {
 		  @RequestHeader("Authentication-Token") String token) {
     for (Reservation reservation : reservations) {
       if (!reservationRepository.findById(reservation.getReservationId()).isPresent()) {
-        throw new RuntimeException("Reservations should exist first");
+        throw new BookerServiceException("Reservations should exist first");
       }
       for (Service service : reservation.getAvailedServiceList()) {
         if (!serviceRepository.findById(service.getServiceId()).isPresent()) {
-          throw new RuntimeException("Service doesn't exist");
+          throw new BookerServiceException("Service doesn't exist");
         }
 
         for (Image image : service.getImages()) {
           if (!imageRepository.findById(image.getImageId()).isPresent()) {
-            throw new RuntimeException("Image doesn't exist");
+            throw new BookerServiceException("Image doesn't exist");
           }
         }
 
 
         if (!customerRepository.findById(reservation.getCustomer().getCustomerId()).isPresent()) {
-          throw new RuntimeException("Customer doesn't exist");
+          throw new BookerServiceException("Customer doesn't exist");
         }
 
         reservation.getAvailedServiceList().add(service);
@@ -126,22 +128,22 @@ public class ReservationController {
   public Reservation updateReservation(@PathVariable("reservationId") int reservationId,
       @RequestBody Reservation reservation, @RequestHeader("Authentication-Token") String token) {
     if (!reservationRepository.findById(reservation.getReservationId()).isPresent()) {
-      throw new RuntimeException("Reservation should exist first");
+      throw new BookerServiceException("Reservation should exist first");
     }
     for (Service service : reservation.getAvailedServiceList()) {
       if (!serviceRepository.findById(service.getServiceId()).isPresent()) {
-        throw new RuntimeException("Service doesn't exist");
+        throw new BookerServiceException("Service doesn't exist");
       }
 
       for (Image image : service.getImages()) {
         if (!imageRepository.findById(image.getImageId()).isPresent()) {
-          throw new RuntimeException("Image doesn't exist");
+          throw new BookerServiceException("Image doesn't exist");
         }
       }
 
 
       if (!customerRepository.findById(reservation.getCustomer().getCustomerId()).isPresent()) {
-        throw new RuntimeException("Customer doesn't exist");
+        throw new BookerServiceException("Customer doesn't exist");
       }
 
     }

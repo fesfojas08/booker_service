@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import pw.io.booker.exception.BookerServiceException;
 import pw.io.booker.model.Customer;
 import pw.io.booker.repo.CustomerRepository;
 
@@ -35,10 +36,13 @@ public class CustomerController {
   }
 
   @PostMapping
-  public List<Customer> saveAll(@RequestBody List<Customer> customers) {
+  public List<Customer> saveAll(@RequestBody List<Customer> customers) throws BookerServiceException {
     for(Customer customer : customers) {
       if(customerRepository.findById(customer.getCustomerId()).isPresent()) {
-        throw new RuntimeException("Customers already exist");
+        throw new BookerServiceException("Customers already exist");
+      }
+      if(customerRepository.findByUsername(customer.getUsername()).isPresent()) {
+    	throw new BookerServiceException("Username already exists");
       }
     }
     return (List<Customer>) customerRepository.saveAll(customers);
@@ -46,10 +50,10 @@ public class CustomerController {
 
   @PutMapping
   public List<Customer> updateAll(@RequestBody List<Customer> customers, 
-		  @RequestHeader("Authentication-Token") String token) {
+		  @RequestHeader("Authentication-Token") String token) throws BookerServiceException {
     for(Customer customer : customers) {
       if(!customerRepository.findById(customer.getCustomerId()).isPresent()) {
-        throw new RuntimeException("Customers should exist first");
+        throw new BookerServiceException("Customers should exist first");
       }
     }
     return (List<Customer>) customerRepository.saveAll(customers);
@@ -71,12 +75,12 @@ public class CustomerController {
 
   @PutMapping("/{customerId}")
   public Customer updateCustomer(@PathVariable("customerId") int customerId,
-      @RequestBody Customer customer, @RequestHeader("Authentication-Token") String token) {
+      @RequestBody Customer customer, @RequestHeader("Authentication-Token") String token) throws BookerServiceException {
     if(customerId != customer.getCustomerId()) {
-      throw new RuntimeException("Id is not the same with the object id");
+      throw new BookerServiceException("Id is not the same with the object id");
     }
     if (!customerRepository.findById(customer.getCustomerId()).isPresent()) {
-      throw new RuntimeException("Customers should exist first");
+      throw new BookerServiceException("Customers should exist first");
     }
     customer.setCustomerId(customerId);
     return customerRepository.save(customer);

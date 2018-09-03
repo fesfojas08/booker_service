@@ -1,0 +1,2 @@
+ INFO pw.io.booker.aspect.AuthenticationAspect 03 Sep 2018 16:54:53. - Initialize the method: getAll
+ INFO pw.io.booker.aspect.AuthenticationAspect 03 Sep 2018 16:54:53. - Successfully executed the method: getAll

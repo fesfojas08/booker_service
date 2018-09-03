@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import pw.io.booker.exception.BookerServiceException;
 import pw.io.booker.model.Feedback;
 import pw.io.booker.model.Reservation;
 import pw.io.booker.repo.FeedbackRepository;
@@ -51,7 +53,7 @@ public class FeedbackController {
       @RequestBody List<Feedback> feedbacks, @RequestHeader("Authentication-Token") String token) {
     for (Feedback feedback : feedbacks) {
       if(!feedbackRepository.findById(feedback.getFeedbackId()).isPresent()) {
-        throw new RuntimeException("Feedback should exist first");
+        throw new BookerServiceException("Feedback should exist first");
       }
     }
     return (List<Feedback>) feedbackRepository.saveAll(feedbacks);
