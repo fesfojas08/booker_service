@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,13 +33,14 @@ public class FeedbackController {
   }
 
   @GetMapping
-  public List<Feedback> getFeedback(@PathVariable("reservationId") int reservationId) {
+  public List<Feedback> getFeedback(@PathVariable("reservationId") int reservationId,
+		  @RequestHeader("Authentication-Token") String token) {
     return reservationRepository.findById(reservationId).get().getFeedbacks();
   }
 
   @PostMapping
   public List<Feedback> saveFeedback(@PathVariable("reservationId") int reservationId,
-      @RequestBody List<Feedback> feedbacks) {
+      @RequestBody List<Feedback> feedbacks, @RequestHeader("Authentication-Token") String token) {
     Reservation reservation = reservationRepository.findById(reservationId).get();
     reservation.getFeedbacks().addAll(feedbacks);
     return reservationRepository.save(reservation).getFeedbacks();
@@ -46,7 +48,7 @@ public class FeedbackController {
 
   @PutMapping
   public List<Feedback> updateFeedback(@PathVariable("reservationId") int reservationId,
-      @RequestBody List<Feedback> feedbacks) {
+      @RequestBody List<Feedback> feedbacks, @RequestHeader("Authentication-Token") String token) {
     for (Feedback feedback : feedbacks) {
       if(!feedbackRepository.findById(feedback.getFeedbackId()).isPresent()) {
         throw new RuntimeException("Feedback should exist first");
@@ -57,7 +59,8 @@ public class FeedbackController {
 
   @DeleteMapping
   public List<Feedback> deleteFeedback(@PathVariable("reservationId") int reservationId,
-      @RequestParam("feedbackIdList") List<Integer> feedBackIdList) {
+      @RequestParam("feedbackIdList") List<Integer> feedBackIdList,
+      @RequestHeader("Authentication-Token") String token) {
     List<Feedback> feedbacks = (List<Feedback>) feedbackRepository.findAllById(feedBackIdList);
     feedbackRepository.deleteAll(feedbacks);
     return feedbacks;

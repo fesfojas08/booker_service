@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,12 +45,13 @@ public class ReservationController {
   }
 
   @GetMapping
-  public List<Reservation> getAll() {
+  public List<Reservation> getAll(@RequestHeader("Authentication-Token") String token) {
     return (List<Reservation>) reservationRepository.findAll();
   }
 
   @PostMapping
-  public List<Reservation> saveAll(@RequestBody List<Reservation> reservations) {
+  public List<Reservation> saveAll(@RequestBody List<Reservation> reservations,
+		  @RequestHeader("Authentication-Token") String token) {
     for (Reservation reservation : reservations) {
       if (reservationRepository.findById(reservation.getReservationId()).isPresent()) {
         throw new RuntimeException("Reservations already exist");
@@ -75,7 +77,8 @@ public class ReservationController {
   }
 
   @PutMapping
-  public List<Reservation> updateAll(@RequestBody List<Reservation> reservations) {
+  public List<Reservation> updateAll(@RequestBody List<Reservation> reservations,
+		  @RequestHeader("Authentication-Token") String token) {
     for (Reservation reservation : reservations) {
       if (!reservationRepository.findById(reservation.getReservationId()).isPresent()) {
         throw new RuntimeException("Reservations should exist first");
@@ -105,7 +108,8 @@ public class ReservationController {
 
   @DeleteMapping
   public List<Reservation> deleteAll(
-      @RequestParam("reservationIdList") List<Integer> reservationIdList) {
+      @RequestParam("reservationIdList") List<Integer> reservationIdList,
+      @RequestHeader("Authentication-Token") String token) {
     List<Reservation> reservationList =
         (List<Reservation>) reservationRepository.findAllById(reservationIdList);
     reservationRepository.deleteAll(reservationList);
@@ -113,13 +117,14 @@ public class ReservationController {
   }
 
   @GetMapping("/{reservationId}")
-  public Reservation getReservation(@PathVariable("reservationId") int reservationId) {
+  public Reservation getReservation(@PathVariable("reservationId") int reservationId,
+		  @RequestHeader("Authentication-Token") String token) {
     return reservationRepository.findById(reservationId).get();
   }
 
   @PutMapping("/{reservationId}")
   public Reservation updateReservation(@PathVariable("reservationId") int reservationId,
-      @RequestBody Reservation reservation) {
+      @RequestBody Reservation reservation, @RequestHeader("Authentication-Token") String token) {
     if (!reservationRepository.findById(reservation.getReservationId()).isPresent()) {
       throw new RuntimeException("Reservation should exist first");
     }
@@ -145,7 +150,8 @@ public class ReservationController {
   }
 
   @DeleteMapping("/{reservationId}")
-  public Reservation deleteReservation(@PathVariable("reservationId") int reservationId) {
+  public Reservation deleteReservation(@PathVariable("reservationId") int reservationId,
+		  @RequestHeader("Authentication-Token") String token) {
     Reservation reservation = reservationRepository.findById(reservationId).get();
     reservationRepository.delete(reservation);
     return reservation;

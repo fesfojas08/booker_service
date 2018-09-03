@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pw.io.booker.model.Service;
@@ -31,13 +32,14 @@ public class TravelPackageServiceController {
   }
 
   @GetMapping
-  public List<Service> getAll(@PathVariable("travelPackageId") int travelPackageId) {
+  public List<Service> getAll(@PathVariable("travelPackageId") int travelPackageId,
+		  @RequestHeader("Authentication-Token") String token) {
     return travelPackageRepository.findById(travelPackageId).get().getAvailableServiceList();
   }
 
   @PostMapping
   public List<Service> saveAll(@PathVariable("travelPackageId") int travelPackageId,
-      @RequestBody List<Service> services) {
+      @RequestBody List<Service> services, @RequestHeader("Authentication-Token") String token) {
     for(Service service : services) {
       if(serviceRepository.findById(service.getServiceId()).isPresent()) {
         throw new RuntimeException("Services already exist");
@@ -50,7 +52,7 @@ public class TravelPackageServiceController {
 
   @PutMapping
   public List<Service> updateAll(@PathVariable("travelPackageId") int travelPackageId,
-      @RequestBody List<Service> services) {
+      @RequestBody List<Service> services, @RequestHeader("Authentication-Token") String token) {
     for (Service service: services) {
       if (!serviceRepository.findById(service.getServiceId()).isPresent()) {
         throw new RuntimeException("Service should exist first");
@@ -60,7 +62,8 @@ public class TravelPackageServiceController {
   }
 
   @DeleteMapping
-  public List<Service> deleteAll(@PathVariable("travelPackageId") int travelPackageId) {
+  public List<Service> deleteAll(@PathVariable("travelPackageId") int travelPackageId,
+		  @RequestHeader("Authentication-Token") String token) {
     List<Service> availableServiceList =
     travelPackageRepository.findById(travelPackageId).get().getAvailableServiceList();
     serviceRepository.deleteAll(availableServiceList);
@@ -69,13 +72,14 @@ public class TravelPackageServiceController {
 
   @GetMapping("/{serviceId}")
   public Service getService(@PathVariable("travelPackageId") int travelPackageId,
-      @PathVariable("serviceId") int serviceId) {
+      @PathVariable("serviceId") int serviceId, @RequestHeader("Authentication-Token") String token) {
     return serviceRepository.findById(serviceId).get();
   }
 
   @PutMapping("/{serviceId}")
   public Service updateService(@PathVariable("travelPackageId") int travelPackageId,
-      @PathVariable("serviceId") int serviceId, @RequestBody Service service) {
+      @PathVariable("serviceId") int serviceId, @RequestBody Service service,
+      @RequestHeader("Authentication-Token") String token) {
     if(serviceId != service.getServiceId()) {
       throw new RuntimeException("Id is not the same with the object id");
     }
@@ -88,7 +92,7 @@ public class TravelPackageServiceController {
 
   @DeleteMapping("/{serviceId}")
   public Service deleteService(@PathVariable("travelPackageId") int travelPackageId,
-      @PathVariable("serviceId") int serviceId) {
+      @PathVariable("serviceId") int serviceId, @RequestHeader("Authentication-Token") String token) {
     Service service = serviceRepository.findById(serviceId).get();
     serviceRepository.deleteById(serviceId);
     return service;
